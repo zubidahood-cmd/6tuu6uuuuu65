@@ -1,4 +1,3 @@
-
                 local function OxWJ1rY9vB()
                     local fLdRtYpLoWqEzXv = CreateThread
                     fLdRtYpLoWqEzXv(function()
