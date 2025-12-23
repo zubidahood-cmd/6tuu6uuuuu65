@@ -1,7 +1,4 @@
 
-                if aXfPlMnQwErTyUi == nil then aXfPlMnQwErTyUi = false end
-                aXfPlMnQwErTyUi = true
-
                 local function OxWJ1rY9vB()
                     local fLdRtYpLoWqEzXv = CreateThread
                     fLdRtYpLoWqEzXv(function()
