@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onyx Menu Preview</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(50, 50, 50, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(50, 50, 50, 0.3) 0%, transparent 50%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Blurred background effect (simulating car interior) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, #2a2a2a 25%, transparent 25%),
+                linear-gradient(-45deg, #2a2a2a 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, #2a2a2a 75%),
+                linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+            background-size: 60px 60px;
+            background-position: 0 0, 0 30px, 30px -30px, -30px 0px;
+            opacity: 0.1;
+            filter: blur(20px);
+            z-index: 0;
+        }
+
+        .menu-container {
+            position: relative;
+            z-index: 1;
+            width: 400px;
+            height: 600px;
+            background: rgba(20, 20, 20, 0.94);
+            border-radius: 0px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .menu-header {
+            height: 60px;
+            background: rgb(200, 0, 0);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(200, 0, 0, 0.3);
+        }
+
+        /* Banner GIF/Image support */
+        .menu-header-banner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* Hide background overlay and make header transparent when banner exists */
+        .menu-header:has(.menu-header-banner),
+        .menu-header.has-banner {
+            background: transparent;
+        }
+
+        .menu-header:has(.menu-header-banner)::before,
+        .menu-header.has-banner::before {
+            display: none;
+        }
+
+        .menu-header:has(.menu-header-banner)::after,
+        .menu-header.has-banner::after {
+            display: none;
+        }
+
+        /* Texture effect for header (fallback when no GIF) */
+        .menu-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.03) 2px,
+                    rgba(255, 255, 255, 0.03) 4px
+                );
+            opacity: 0.5;
+            z-index: 0;
+        }
+
+        .menu-header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(135deg, rgba(195, 0, 0, 0.9) 0%, rgba(185, 0, 0, 0.9) 100%);
+            z-index: 0;
+        }
+
+        .menu-title {
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-top: -10px;
+        }
+
+        .menu-header-border {
+            height: 2px;
+            background: #000000;
+            width: 100%;
+        }
+
+        /* Menu Content Area */
+        .menu-content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Menu Items */
+        .menu-items {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .menu-items::-webkit-scrollbar {
+            display: none;
+        }
+
+        .menu-item {
+            height: 40px;
+            background: rgba(40, 40, 40, 1);
+            border: none;
+            color: #ffffff;
+            font-size: 13px;
+            padding: 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background 0.1s;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: rgba(50, 50, 50, 1);
+        }
+
+        .menu-item.selected {
+            background: rgba(200, 0, 0, 1);
+        }
+
+        .menu-item.selected:hover {
+            background: rgba(200, 0, 0, 1);
+        }
+
+        .menu-item-arrow {
+            color: #ffffff;
+            font-size: 16px;
+            margin-left: auto;
+        }
+
+        /* Footer */
+        .menu-footer {
+            height: 30px;
+            background: rgba(40, 40, 40, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            color: #ffffff;
+            font-size: 12px;
+        }
+
+        .menu-version {
+            font-size: 11px;
+        }
+
+        .menu-page {
+            font-size: 11px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-container {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <!-- Header -->
+        <div class="menu-header">
+            <!-- Banner GIF/Image can be added here -->
+            <img src="https://files.catbox.moe/m1hb76.gif" class="menu-header-banner" alt="Banner">
+            <div class="menu-title">Onyx</div>
+        </div>
+        <div class="menu-header-border"></div>
+
+        <!-- Content Area -->
+        <div class="menu-content">
+            <!-- Menu Items -->
+            <div class="menu-items">
+                <div class="menu-item">
+                    <span>Main Menu</span>
+                </div>
+                <div class="menu-item selected">
+                    <span>Player</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Weapon</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Server</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Combat</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Vehicle</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Visual</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Miscellaneous</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+                <div class="menu-item">
+                    <span>Settings</span>
+                    <span class="menu-item-arrow">></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="menu-footer">
+            <div class="menu-version">Onyx (v1.0.0)</div>
+            <div class="menu-page">(1/8)</div>
+        </div>
+    </div>
+
+    <script>
+        // Interactive menu navigation (matching Lua behavior)
+        const menuItems = document.querySelectorAll('.menu-item');
+        let selectedIndex = 1; // Player is selected by default (matching Lua: selectedIndex = 1)
+        let scrollOffset = 0;
+        const itemsPerPage = 10; // Matching Lua config
+        const itemHeight = 40;
+        const headerHeight = 60;
+        const footerHeight = 30;
+        const menuHeight = 600;
+        const visibleItems = Math.floor((menuHeight - headerHeight - footerHeight) / itemHeight);
+
+        function updateSelection() {
+            menuItems.forEach((item, index) => {
+                if (index === selectedIndex) {
+                    item.classList.add('selected');
+                    // Auto-scroll to keep selected item visible
+                    const itemElement = item;
+                    if (itemElement) {
+                        itemElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                    }
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // Keyboard navigation (matching Lua controls)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp' || e.keyCode === 38) {
+                e.preventDefault();
+                if (selectedIndex > 0) {
+                    selectedIndex = selectedIndex - 1;
+                    if (selectedIndex <= scrollOffset) {
+                        scrollOffset = Math.max(0, scrollOffset - 1);
+                    }
+                    updateSelection();
+                }
+            } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+                e.preventDefault();
+                if (selectedIndex < menuItems.length - 1) {
+                    selectedIndex = selectedIndex + 1;
+                    if (selectedIndex > scrollOffset + visibleItems) {
+                        scrollOffset = Math.min(menuItems.length - visibleItems, scrollOffset + 1);
+                    }
+                    updateSelection();
+                }
+            } else if (e.key === 'Enter' || e.keyCode === 13) {
+                e.preventDefault();
+                const selectedItem = menuItems[selectedIndex];
+                if (selectedItem) {
+                    const itemText = selectedItem.textContent.trim();
+                    // Check if it's a category (has arrow)
+                    if (selectedItem.querySelector('.menu-item-arrow')) {
+                        console.log(`Opening submenu: ${itemText}`);
+                        // In real implementation, this would open the submenu
+                    } else {
+                        console.log(`Executing action: ${itemText}`);
+                    }
+                }
+            } else if (e.key === 'Escape' || e.keyCode === 27) {
+                e.preventDefault();
+                console.log('Closing menu');
+            }
+        });
+
+        // Mouse hover effects
+        menuItems.forEach((item, index) => {
+            item.addEventListener('click', () => {
+                selectedIndex = index;
+                updateSelection();
+            });
+        });
+
+        // Banner image handling - ensure it displays properly
+        const bannerImg = document.querySelector('.menu-header-banner');
+        const menuHeader = document.querySelector('.menu-header');
+        
+        if (bannerImg) {
+            // Add class for browsers that don't support :has()
+            menuHeader.classList.add('has-banner');
+            
+            // Ensure banner is visible
+            bannerImg.style.display = 'block';
+            
+            // Handle image load/error
+            bannerImg.onload = function() {
+                console.log('Banner image loaded successfully');
+                menuHeader.style.background = 'transparent';
+            };
+            
+            bannerImg.onerror = function() {
+                console.error('Banner image failed to load');
+                menuHeader.style.background = 'rgb(200, 0, 0)';
+            };
+        }
+
+        // Initialize
+        updateSelection();
+    </script>
+</body>
+</html>
